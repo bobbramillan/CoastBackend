@@ -1,0 +1,39 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build JAR
+        run: mvn package -f CoastBackend/pom.xml
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy Lambda functions
+        run: |
+          aws lambda update-function-code --function-name coast-fetch-user-by-email --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-fetch-existing-user-ids --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-email-exists --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-insert-user --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-update-user --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-delete-user --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
