@@ -48,6 +48,11 @@ public class UpdateUserHandler implements RequestHandler<APIGatewayProxyRequestE
     private APIGatewayProxyResponseEvent response(int statusCode, String body) {
         return new APIGatewayProxyResponseEvent()
                 .withStatusCode(statusCode)
+                .withHeaders(java.util.Map.of(
+                        "Access-Control-Allow-Origin", "*",
+                        "Access-Control-Allow-Headers", "Content-Type",
+                        "Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS"
+                ))
                 .withBody(body);
     }
 }
