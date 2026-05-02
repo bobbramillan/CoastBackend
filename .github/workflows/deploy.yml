@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build JAR
-        run: mvn package -f CoastBackend/pom.xml
+        run: mvn package
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -31,9 +31,9 @@ jobs:
 
       - name: Deploy Lambda functions
         run: |
-          aws lambda update-function-code --function-name coast-fetch-user-by-email --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
-          aws lambda update-function-code --function-name coast-fetch-existing-user-ids --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
-          aws lambda update-function-code --function-name coast-email-exists --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
-          aws lambda update-function-code --function-name coast-insert-user --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
-          aws lambda update-function-code --function-name coast-update-user --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
-          aws lambda update-function-code --function-name coast-delete-user --zip-file fileb://CoastBackend/target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-fetch-user-by-email --zip-file fileb://target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-fetch-existing-user-ids --zip-file fileb://target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-email-exists --zip-file fileb://target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-insert-user --zip-file fileb://target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-update-user --zip-file fileb://target/CoastBackend-1.0-SNAPSHOT.jar
+          aws lambda update-function-code --function-name coast-delete-user --zip-file fileb://target/CoastBackend-1.0-SNAPSHOT.jar
