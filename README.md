@@ -18,14 +18,61 @@ Every time a Coast client needs to read or write data, it calls an HTTPS endpoin
 
 ---
 
-## AWS Setup
+## AWS Account Info
 
 - **AWS Account ID:** 601084006791
-- **Region:** us-east-1
-- **API Gateway ID:** zw4lbcamf5
-- **Base URL:** https://zw4lbcamf5.execute-api.us-east-1.amazonaws.com/prod
-- **IAM Role:** coast-lambda-role
-- **Secret Name:** coast/supabase (stores SUPABASE_URL and SUPABASE_API_KEY)
+- **Region:** us-east-1 (N. Virginia) — all resources live here
+- **Console:** https://console.aws.amazon.com — sign in with your AWS root or IAM account
+
+---
+
+## Finding Everything in the AWS Console
+
+Once logged in, use the search bar at the top to find each service.
+
+**Lambda** → search "Lambda"
+- Click Functions in the left sidebar
+- Filter by "coast" to see all six functions:
+    - coast-fetch-user-by-email
+    - coast-fetch-existing-user-ids
+    - coast-email-exists
+    - coast-insert-user
+    - coast-update-user
+    - coast-delete-user
+- Click any function to test it, view logs, or check its configuration
+
+**API Gateway** → search "API Gateway"
+- Click on `coast-api`
+- Under Resources you'll see all six routes and their methods
+- Under Stages → prod you'll find the base URL
+- Base URL: https://zw4lbcamf5.execute-api.us-east-1.amazonaws.com/prod
+
+**Secrets Manager** → search "Secrets Manager"
+- Click on `coast/supabase`
+- Click "Retrieve secret value" to see your SUPABASE_URL and SUPABASE_API_KEY
+- This is the only place credentials are stored
+
+**IAM** → search "IAM"
+- Users → `coast-admin` — the user your CLI and GitHub Actions use to deploy
+- Roles → `coast-lambda-role` — the role your Lambda functions run as
+- If you need new access keys: coast-admin → Security credentials → Create access key
+
+**CloudWatch** → search "CloudWatch"
+- Log groups → search `/aws/lambda/coast-` to see logs for each function
+- Use this to debug Lambda errors
+
+---
+
+## AWS Setup Reference
+
+| Resource | Name / ID |
+|---|---|
+| API Gateway ID | zw4lbcamf5 |
+| API Gateway stage | prod |
+| IAM User | coast-admin |
+| IAM Role | coast-lambda-role |
+| Secret | coast/supabase |
+| Region | us-east-1 |
 
 ---
 
@@ -68,6 +115,11 @@ Every push to `main` triggers a GitHub Actions workflow that:
 2. Builds the fat JAR with `mvn package`
 3. Authenticates with AWS using `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (stored as GitHub secrets)
 4. Deploys all six Lambda functions with `aws lambda update-function-code`
+
+To view or update GitHub secrets:
+- Go to github.com/bobbramillan/CoastBackend → Settings → Secrets and variables → Actions
+- Secrets are write-only — you cannot view them once saved
+- If you lose your AWS keys, generate new ones in IAM → coast-admin → Security credentials
 
 ---
 
@@ -114,4 +166,5 @@ Or just push to main and CI/CD handles it automatically.
 
 - This repo is private — the Lambda handler structure and API Gateway URL are sensitive
 - Supabase credentials are never stored in code — only in AWS Secrets Manager
-- The deployed JAR uses `com.coast.*` package names
+- The API Gateway base URL alone returns {"message":"Missing Authentication Token"} — this is normal, you must include a valid path like /fetch-existing-user-ids
+- The deployed JAR uses com.coast.* package names
